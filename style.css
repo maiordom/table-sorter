@@ -1,0 +1,36 @@
+*                               {padding:0; margin:0;}
+.empty-object                   {background:#034 !important; color:#034 !important;}
+.empty-object *                 {border-color:#034;}
+
+body                            {background:#666;}
+.control-buttons                {padding:10px; margin-left:20px; background:#EEEEF4; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;}
+.control-buttons input[type="text"]   {margin-left:20px;}
+.control-buttons input[type="button"] {padding: 0 10px;}
+
+#drag-table-1, #drag-table-2,
+#drag-table-3, #drag-table-4    {margin:20px;}
+
+table > * > tr > td             {width:104px; height: 20px;}
+
+#drag-table-1 > *     > tr > th {background:#5471d6; color:#fff; border:1px solid #000; font-weight:normal;}
+#drag-table-1 > tbody > tr > td {background:#dfe3f0;}
+#drag-table-1 > *     > tr > td {border:1px solid #000;}
+
+#drag-table-2                   {background:#aaf1d9;}
+#drag-table-2 > *     > tr > th {background:#5eaf75; color:#fff; padding:3px; font-weight:normal;}
+#drag-table-2 > tbody > tr > td {background:#dfe3f0;}
+#drag-table-2 > *     > tr > td {border:1px solid #000;}
+
+#drag-table-3                   {background:#fff;}
+#drag-table-3 > *     > tr > td {border:1px solid #888;}
+
+#drag-table-4                   {margin:20px; font-family:Arial, sans-serif; background:#ddd; color:#ddd;}
+#drag-table-4 > *     > tr > td {padding:10px;}
+#drag-table-4 .even             {background:#30356f;}
+#drag-table-4 .odd              {background:#c89018; color:#000;}
+
+#tutorial                       {width:760px; font: 13px/1.231 arial,helvetica,clean,sans-serif; background: #EEEEF4; padding:20px; margin: 20px auto; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;}
+#header                         {font-weight: bold; font-size: 116%; color: white; background: #50506D; margin-bottom:1em; padding: 4px 8px 5px; -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px;}
+#examples                       {margin:20px auto; width:900px;}
+#header-2                       {font-weight: bold; font-size: 100%; color: white; background: #8B8B9F; margin: 1em 0; padding: 4px 8px 5px; -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px;}
+pre                             {margin:10px;}
