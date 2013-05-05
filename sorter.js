@@ -332,6 +332,7 @@
                 dragObject: cloneTable[ 0 ]
             };
             addDocumentEventHandlers();
+            document.body.style.cursor = 'move';
 
             return false;
         }
@@ -350,8 +351,13 @@
             setDragRow( this );
 
             activeDrag = 'rows';
-            mouseDownAt = { x: e.pageX, y: e.pageY, dragObject: cloneRow[ 0 ] };
+            mouseDownAt = {
+                x: e.pageX,
+                y: e.pageY,
+                dragObject: cloneRow[ 0 ]
+            };
             addDocumentEventHandlers();
+            document.body.style.cursor = 'move';
 
             return false;
         }
@@ -386,6 +392,7 @@
             dragObject = null;
             hideEmpty();
             removeDocumentEventHandlers();
+            document.body.style.cursor = '';
         }
 
         api = {
