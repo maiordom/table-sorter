@@ -5,13 +5,13 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
     <title>drag'n'drop</title>
-    <link href="sorter.css" type="text/css" rel="stylesheet">
+    <link href="table-sorter.css" type="text/css" rel="stylesheet">
 </head>
 
 <body>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script type="text/javascript" src="sorter.js"></script>
+<script type="text/javascript" src="table-sorter.js"></script>
 <script type="text/javascript">
     $( document ).ready( function() {
         var methods = 'stopRowsDrag stopColsDrag startRowsDrag startColsDrag addRow addCol delRow delCol startEditMode stopEditMode'.split( ' ' );
@@ -22,10 +22,10 @@
             );
         }
 
-        $( '#examples table' ).sorter();
+        $( '#examples table' ).tableSorter();
 
-        var table1API = $( '#drag-table-1' ).data( 'sorter' ),
-            table2API = $( '#drag-table-2' ).data( 'sorter' );
+        var table1API = $( '#drag-table-1' ).data( 'tableSorter' ),
+            table2API = $( '#drag-table-2' ).data( 'tableSorter' );
 
         $( '.init-method-drag-1' ).click( function() {
             var methodName = $( '.method-drag-1 option:selected' ).text();

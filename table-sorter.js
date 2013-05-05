@@ -1,9 +1,9 @@
 /*
-     jQuery <Sorter plugin>
+     jQuery <Table Sorter plugin>
  */
 
 (function( $ ) {
-    function Sorter( table, options ) {
+    function TableSorter( table, options ) {
         var dragObject = null, mouseOffset, mouseDownAt, activeDrag, conditionDragObj,
             tbody, thead, rows, cols, rect, api, $table,
             cloneTable, cloneRow, cloneTableContainer = $( '<div />' ), cloneRowContainer = $( '<div />' ),
@@ -20,7 +20,7 @@
             $( rows ).bind( 'mousedown', startRowsDrag );
             getRectCoords();
             initTableClone();
-            $table.data( 'sorter', api );
+            $table.data( 'tableSorter', api );
         }
 
         function getRectCoords() {
@@ -442,11 +442,11 @@
             },
 
             delCol: function( numCol ) {
-                var num, LENGTH = $( rows[ 0 ] ).children().length;
+                var num, length = $( rows[ 0 ] ).children().length;
 
                 if ( numCol === undefined ) {
-                    num = LENGTH - 1;
-                } else if ( numCol > LENGTH ) {
+                    num = length - 1;
+                } else if ( numCol > length ) {
                     return;
                 } else {
                     num = numCol - 1;
@@ -511,15 +511,15 @@
         init();
     }
 
-    $.fn.sorter = function( options ) {
+    $.fn.tableSorter = function( options ) {
         var item, entity;
         $( this ).each( function() {
             item = $( this );
-            if ( item.data( 'sorter' ) ) {
+            if ( item.data( 'tableSorter' ) ) {
                 console.log( 'Sorter already init', this );
             } else {
-                entity = Sorter( this, options );
-                item.data( 'sorter', entity );
+                entity = TableSorter( this, options );
+                item.data( 'tableSorter', entity );
             }
         });
     }
