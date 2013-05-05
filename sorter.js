@@ -3,7 +3,7 @@
  */
 
 (function( $ ) {
-    function Table( table ) {
+    function Sorter( table, options ) {
         var dragObject = null, mouseOffset, mouseDownAt, activeDrag, conditionDragObj,
             tbody, thead, rows, cols, rect, api, $table,
             cloneTable, cloneRow, cloneTableContainer = $( '<div />' ), cloneRowContainer = $( '<div />' ),
@@ -511,7 +511,7 @@
             if ( item.data( 'sorter' ) ) {
                 console.log( 'Sorter already init', this );
             } else {
-                entity = Table( this );
+                entity = Sorter( this, options );
                 item.data( 'sorter', entity );
             }
         });

@@ -4,7 +4,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
-    <title>drag'b'drop</title>
+    <title>drag'n'drop</title>
     <link href="sorter.css" type="text/css" rel="stylesheet">
 </head>
 
@@ -46,16 +46,15 @@
     <p>After include the relevant files in the &lt;HEAD&gt; of your document, initialise plugin on document.ready:</p>
 
     <pre>
-    $(document).ready(function()
-    {
-        $('#examples table').tableSorter();
+    $( document ).ready( function() {
+        $( '#examples table' ).tableSorter();
     });
     </pre>
 
-    <p>For example, we can stop row dragging for a third table by using</p>
+    <p>For example, we can stop row dragging for a third table by using:</p>
 
     <pre>
-    $('#drag-table-3').tableSorter('stopRowsDrag');
+    $( '#drag-table-3' ).tableSorter( 'stopRowsDrag' );
     </pre>
 
     <p>If the table has no &lt;TH&gt; tag, the event to move columns is not possible.</p>
@@ -63,7 +62,10 @@
     <p>The Plugin uses CSS:</p>
 
     <pre>
-    .empty-object {background:#034 !important; color:#034 !important;}
+    .empty-object {
+        background:#034 !important;
+        color:#034 !important;
+        }
     </pre>
 
     <p>To finish editing cell press esc or enter when edit mode on.</p>
@@ -90,10 +92,10 @@
             <td>addCol()</td>
         </tr>
         <tr>
-            <td>delRow(numRow)</td>
+            <td>delRow( numRow )</td>
         </tr>
         <tr>
-            <td>delCol(numCol)</td>
+            <td>delCol( numCol )</td>
         </tr>
         <tr>
             <td>startEditMode()</td>
@@ -107,10 +109,6 @@
 </div>
 
 <div id="examples">
-
-    <table id="drag-table-0" border="1" style="background: #fff;">
-        <tbody></tbody>
-    </table>
 
     <table cellspacing="0" id="drag-table-1">
         <tbody>
