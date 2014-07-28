@@ -1,76 +1,94 @@
-/*
-     jQuery <Table Sorter plugin>
- */
+(function( $, window, undefined ) {
+    'use strict';
 
-(function( $ ) {
-    function TableSorter( table, options ) {
-        var dragObject = null, mouseOffset, mouseDownAt, activeDrag, conditionDragObj,
-            tbody, thead, rows, cols, rect, api, $table,
-            cloneTable, cloneRow, cloneTableContainer = $( '<div />' ), cloneRowContainer = $( '<div />' ),
-            dragCells = [], dropTargetRectangles = [], deleteHeightStyle = false;
+    var TableSorter = function() {
+        this.init.apply( this, arguments );
+    };
 
-        function init() {
-            $table = $( table );
-            tbody  = table.tBodies[ 0 ],
-            thead  = table.tHead,
-            rows   = tbody.children,
-            cols   = $( rows ).children().filter( 'th' );
-            
-            $( cols ).bind( 'mousedown', startColsDrag );
-            $( rows ).bind( 'mousedown', startRowsDrag );
-            getRectCoords();
-            initTableClone();
-            $table.data( 'tableSorter', api );
-        }
+    var bindEvent = function( fn, ctx ) {
+        var bindArgs = [].slice.call( arguments, 2 ), callbackArgs;
+        return function() {
+            callbackArgs = bindArgs.concat( this, [].slice.call( arguments ) );
+            return fn.apply( ctx, callbackArgs );
+        };
+    };
 
-        function getRectCoords() {
-            var offset = $table.offset();
+    TableSorter.prototype = {
+        rect: {},
+        cloneTable: null,
+        activeDrag: null,
+        conditionDragObj: null,
+        deleteHeightStyle: false,
+        dragCells: [],
+        dropTargetRectangles: [],
 
-            rect = {
+        init: function( el, options ) {
+            this.cacheObjects( el );
+            this.attachEvents();
+            this.getRectCoords();
+            this.initTableClone();
+        },
+
+        cacheObjects: function( el ) {
+            this.cloneTableContainer = $( '<div />' );
+            this.cloneRowContainer   = $( '<div />' );
+            this.el    = el;
+            this.table = $( el );
+            this.tbody = el.tBodies[ 0 ];
+            this.thead = el.tHead;
+            this.rows  = this.tbody.children;
+            this.cols  = $( this.rows ).children().filter( 'th' );
+        },
+
+        attachEvents: function() {
+            $( this.cols ).bind( 'mousedown', bindEvent( this.startColsDrag, this ) );
+            $( this.rows ).bind( 'mousedown', bindEvent( this.startRowsDrag, this ) );
+        },
+
+        getRectCoords: function() {
+            var offset = this.table.offset();
+
+            this.rect = {
                 xmin: offset.left,
                 ymin: offset.top,
-                xmax: offset.left + table.offsetWidth,
-                ymax: offset.top  + table.offsetHeight
+                xmax: offset.left + this.el.offsetWidth,
+                ymax: offset.top  + this.el.offsetHeight
             };
-        }
+        },
 
-        function initTableClone() {
-            cloneTable = $table.clone( false ).css({
-                margin: 0,
-                zIndex: 1,
-                position: 'absolute'
-            });
-            cloneTable.appendTo( cloneTableContainer );
-            cloneTable.children().filter( 'thead, tfoot' ).remove();
-            cloneRow = cloneTable.clone( false ).appendTo( cloneRowContainer );
+        initTableClone: function() {
+            this.cloneTable = this.table.clone( false ).css( { margin: 0, zIndex: 1, position: 'absolute' } );
+            this.cloneTable.appendTo( this.cloneTableContainer );
+            this.cloneTable.children().filter( 'thead, tfoot' ).remove();
+            this.cloneRow = this.cloneTable.clone( false ).appendTo( this.cloneRowContainer );
 
-            clearCloneTable( cloneTable );
-            cloneRow.find( 'tbody' ).empty();
-        }
+            this.clearCloneTable( this.cloneTable );
+            this.cloneRow.find( 'tbody' ).empty();
+        },
 
-        function clearCloneTable( table ) {
+        clearCloneTable: function( table ) {
             table.children().children().empty();
-        }
+        },
 
-        function clearRowClone( row ) {
+        clearRowClone: function( row ) {
             row.children().filter( 'tbody' ).empty();
-        }
+        },
 
-        function hideEmpty() {
-            activeDrag === 'rows' ?
-                cloneRow.appendTo( cloneRowContainer ) :
-                cloneTable.appendTo( cloneTableContainer );
+        hideEmpty: function() {
+            this.activeDrag === 'rows' ?
+                this.cloneRow.appendTo( this.cloneRowContainer ) :
+                this.cloneTable.appendTo( this.cloneTableContainer );
 
             $( '.empty-temp' ).removeClass( 'empty-object' ).removeClass( 'empty-temp' );
 
-            if ( deleteHeightStyle ) {
-                $table.css( 'height', '' );
-                deleteHeightStyle = false;
+            if ( this.deleteHeightStyle ) {
+                this.table.css( 'height', '' );
+                this.deleteHeightStyle = false;
             }
-        }
+        },
 
-        function cacheDropTargetRectangles( dropTargets, fixedHeight ) {
-            dropTargetRectangles = [];
+        cacheDropTargetRectangles: function( dropTargets, fixedHeight ) {
+            this.dropTargetRectangles = [];
 
             for ( var i = 0; i < dropTargets.length; i++ ) {
                 var targ       = dropTargets[ i ],
@@ -78,99 +96,111 @@
                     targWidth  = parseInt( targ.offsetWidth ),
                     targHeight = parseInt( targ.offsetHeight );
 
-                dropTargetRectangles.push({
+                this.dropTargetRectangles.push({
                     xmin: targPos.left,
                     xmax: targPos.left + targWidth,
                     ymin: targPos.top,
-                    ymax: fixedHeight === true ? rect.ymax : targPos.top + targHeight,
+                    ymax: fixedHeight === true ? this.rect.ymax : targPos.top + targHeight,
                     dropTarget: targ
                 });
             }
-        }
+        },
 
-        function changePosition( e ) {
-            if ( detectExitFromRect( e ) !== null ) {
-                if ( activeDrag === 'cols' ) {
-                    changeColPosition( e );
+        changePosition: function( e ) {
+            if ( this.detectExitFromRect( e ) !== null ) {
+                if ( this.activeDrag === 'cols' ) {
+                    this.changeColPosition( e );
                 } else {
-                    changeRowPosition( e );
+                    this.changeRowPosition( e );
                 }
             }
-        }
+        },
 
-        function detectExitFromRect( e ) {
-            var ulX = e.pageX - rect.xmin,
-                ulY = e.pageY - rect.ymin;
+        detectExitFromRect: function( e ) {
+            var ulX = e.pageX - this.rect.xmin,
+                ulY = e.pageY - this.rect.ymin;
 
-            if ( ulX < 0 || ulX > rect.xmax - rect.xmin || ulY < 0 || ulY > rect.ymax - rect.ymin ) {
+            if ( ulX < 0 || ulX > this.rect.xmax - this.rect.xmin || ulY < 0 || ulY > this.rect.ymax - this.rect.ymin ) {
                 return null;
             }
-        }
+        },
 
-        function changeRowPosition( e ) {
-            var elem = getCurrentTarget( e, "top" );
+        changeRowPosition: function( e ) {
+            var elem = this.getCurrentTarget( e, "top" );
 
-            if ( elem && elem.rowIndex > conditionDragObj.rowIndex ) {
-                $( elem ).insertBefore( conditionDragObj );
-                cacheDropTargetRectangles( rows );
+            if ( elem && elem.rowIndex > this.conditionDragObj.rowIndex ) {
+                $( elem ).insertBefore( this.conditionDragObj );
+                this.cacheDropTargetRectangles( this.rows );
                 return false;
             }
 
-            elem = getCurrentTarget( e, "bottom" );
+            elem = this.getCurrentTarget( e, "bottom" );
 
-            if ( elem && elem.rowIndex < conditionDragObj.rowIndex ) {
-                $( elem ).insertAfter( conditionDragObj );
-                cacheDropTargetRectangles( rows );
+            if ( elem && elem.rowIndex < this.conditionDragObj.rowIndex ) {
+                $( elem ).insertAfter( this.conditionDragObj );
+                this.cacheDropTargetRectangles( this.rows );
             }
-        }
+        },
 
-        function changeColPosition( e ) {
-            var elem, drop, dragRowIndex, tempDrop = [], condition, top, i;
+        changeColPosition: function( e ) {
+            var elem, dragRowIndex;
 
-            dragRowIndex = $( conditionDragObj ).parent()[ 0 ].rowIndex;
+            dragRowIndex = $( this.conditionDragObj ).parent()[ 0 ].rowIndex;
+            elem = this.getCurrentTarget( e, "left" );
 
-            elem = getCurrentTarget( e, "left" );
-            if ( elem && elem.cellIndex > conditionDragObj.cellIndex ) {
-                drop = $( tbody ).children().filter( function() {
-                    if ( this.rowIndex === dragRowIndex || this.rowIndex > dragRowIndex ) {
-                        tempDrop.push( $( this ).children().eq( elem.cellIndex ) );
-                    }
-                });
-
-                drop = tempDrop;
-
-                for ( i = 0; i < dragCells.length; i++ ) {
-                    $( dragCells[ i ] ).insertAfter( drop[ i ] );
-                }
-
-                conditionDragObj = dragCells[ 0 ];
-                cacheDropTargetRectangles( $( conditionDragObj ).parent().children(), true );
-
+            if ( elem && elem.cellIndex > this.conditionDragObj.cellIndex ) {
+                this.moveColToRight( elem, dragRowIndex );
                 return false;
             }
 
-            elem = getCurrentTarget( e, "right" );
-            if ( elem && elem.cellIndex < conditionDragObj.cellIndex ) {
-                drop = $( tbody ).children().filter( function() {
-                    if ( this.rowIndex === dragRowIndex || this.rowIndex > dragRowIndex ) {
-                        tempDrop.push( $( this ).children().eq( elem.cellIndex ) );
-                    }
-                });
+            elem = this.getCurrentTarget( e, "right" );
 
-                drop = tempDrop;
-
-                for ( i = 0; i < dragCells.length; i++ ) {
-                    $( dragCells[ i ] ).insertBefore( drop[ i ] );
-                }
-
-                conditionDragObj = dragCells[ 0 ];
-                cacheDropTargetRectangles( $( conditionDragObj ).parent().children(), true );
+            if ( elem && elem.cellIndex < this.conditionDragObj.cellIndex ) {
+                this.moveColToLeft( elem, dragRowIndex );
             }
-        }
+        },
 
-        function getCurrentTarget( e, orientation ) {
-            for ( var i = 0; i < dropTargetRectangles.length; i++ ) {
-                var rect = dropTargetRectangles[ i ],
+        moveColToLeft: function( elem, dragRowIndex ) {
+            var drop, tempDrop = [];
+
+            drop = $( this.tbody ).children().filter( function() {
+                if ( this.rowIndex === dragRowIndex || this.rowIndex > dragRowIndex ) {
+                    tempDrop.push( $( this ).children().eq( elem.cellIndex ) );
+                }
+            });
+
+            drop = tempDrop;
+
+            for ( var i = 0; i < this.dragCells.length; i++ ) {
+                $( this.dragCells[ i ] ).insertBefore( drop[ i ] );
+            }
+
+            this.conditionDragObj = this.dragCells[ 0 ];
+            this.cacheDropTargetRectangles( $( this.conditionDragObj ).parent().children(), true );
+        },
+
+        moveColToRight: function( elem, dragRowIndex ) {
+            var drop, tempDrop = [];
+
+            drop = $( this.tbody ).children().filter( function() {
+                if ( this.rowIndex === dragRowIndex || this.rowIndex > dragRowIndex ) {
+                    tempDrop.push( $( this ).children().eq( elem.cellIndex ) );
+                }
+            });
+
+            drop = tempDrop;
+
+            for ( var i = 0; i < this.dragCells.length; i++ ) {
+                $( this.dragCells[ i ] ).insertAfter( drop[ i ] );
+            }
+
+            this.conditionDragObj = this.dragCells[ 0 ];
+            this.cacheDropTargetRectangles( $( this.conditionDragObj ).parent().children(), true );
+        },
+
+        getCurrentTarget: function( e, orientation ) {
+            for ( var i = 0; i < this.dropTargetRectangles.length; i++ ) {
+                var rect       = this.dropTargetRectangles[ i ],
                     halfWidth  = rect.xmin + ( rect.xmax - rect.xmin ) / 2,
                     halfHeight = rect.ymin + ( rect.ymax - rect.ymin ) / 2;
 
@@ -202,12 +232,12 @@
             }
 
             return false;
-        }
+        },
 
-        function addDocumentEventHandlers() {
+        addDocumentEventHandlers: function() {
             $( document ).bind({
-                mousemove: mousemove,
-                mouseup: mouseup
+                mousemove: bindEvent( this.mousemove, this ),
+                mouseup:   bindEvent( this.mouseup, this )
             });
 
             document.ondragstart = function() {
@@ -217,35 +247,35 @@
             document.body.onselectstart = function() {
                 return false;
             };
-        }
+        },
 
-        function removeDocumentEventHandlers() {
+        removeDocumentEventHandlers: function() {
             $( document ).unbind( 'mousemove mouseup' );
             document.ondragstart = null;
             document.body.onselectstart = null;
-        }
+        },
 
-        function getMouseOffset( target, x, y ) {
+        getMouseOffset: function( target, x, y ) {
             var docPos = $( target ).offset();
             return { x: x - docPos.left, y: y - docPos.top };
-        }
+        },
 
-        function showDrag( e ) {
-            if ( dragObject ) {
-                dragObject.style.left = e.pageX - mouseOffset.x + 'px';
-                dragObject.style.top  = e.pageY - mouseOffset.y + 'px';
-                changePosition( e );
+        showDrag: function( e ) {
+            if ( this.dragObject ) {
+                this.dragObject.style.left = e.pageX - this.mouseOffset.x + 'px';
+                this.dragObject.style.top  = e.pageY - this.mouseOffset.y + 'px';
+                this.changePosition( e );
             }
-        }
+        },
 
-        function getTdClone( elem ) {
+        getTdClone: function( elem ) {
             return elem.clone( false ).css({
                 height: elem.height(),
                 width: elem.width()
             });
-        }
+        },
 
-        function getTrClone( row ) {
+        getTrClone: function( row ) {
             var clone = row.clone( false ).empty(), data, item;
 
             row.children().each( function() {
@@ -259,27 +289,27 @@
             });
 
             return clone;
-        }
+        },
 
-        function setDragColumn( col ) {
+        setDragColumn: function( col ) {
             var colNum = col.cellIndex, coords = $( col ).offset(), td, tr, tempRows, dragRowIndex,
                 cloneTableWidth, cloneTableChildren, cloneTableCellspacing, cloneTableBorder;
 
-            dragCells = [ col ];
+            this.dragCells = [ col ];
 
-            cloneTableCellspacing = cloneTable[ 0 ].getAttribute( 'cellspacing' );
-            cloneTableBorder = cloneTable[ 0 ].getAttribute( 'border' );
+            cloneTableCellspacing = this.cloneTable[ 0 ].getAttribute( 'cellspacing' );
+            cloneTableBorder = this.cloneTable[ 0 ].getAttribute( 'border' );
             cloneTableWidth = $( col ).outerWidth() + cloneTableCellspacing * 2 + cloneTableBorder * 2;
-            cloneTable.width( cloneTableWidth );
+            this.cloneTable.width( cloneTableWidth );
 
-            cloneTableChildren = cloneTable.children().children();
-            cloneTableChildren.filter( 'tr:first' ).append( getTdClone( $( col ) ) );
+            cloneTableChildren = this.cloneTable.children().children();
+            cloneTableChildren.filter( 'tr:first' ).append( this.getTdClone( $( col ) ) );
             tr = cloneTableChildren.slice( 1 ).show();
 
             $( col ).addClass( 'empty-temp' );
 
-            dragRowIndex = $( conditionDragObj ).parent()[ 0 ].rowIndex;
-            tempRows = $( tbody ).children().filter( function() {
+            dragRowIndex = $( this.conditionDragObj ).parent()[ 0 ].rowIndex;
+            tempRows = $( this.tbody ).children().filter( function() {
                 if ( this.rowIndex > dragRowIndex ) {
                     return this;
                 }
@@ -287,8 +317,8 @@
 
             for ( var i = 0; i < tempRows.length; i++ ) {
                 td = $( tempRows[ i ] ).children().eq( colNum );
-                dragCells.push( td[ 0 ] );
-                $( tr[ i ] ).append( getTdClone( td ) );
+                this.dragCells.push( td[ 0 ] );
+                $( tr[ i ] ).append( this.getTdClone( td ) );
                 td.addClass( 'empty-temp' );
             }
 
@@ -298,229 +328,116 @@
                 }
             });
 
-            cloneTable.css({
+            this.cloneTable.css({
                 left: coords.left,
                 top:  coords.top
             });
-        }
+        },
 
-        function setDragRow( row ) {
+        setDragRow: function( row ) {
             var $row = $( row ),
                 coords = $row.offset();
 
-            cloneRow.width( $row.width() );
-            cloneRow.append( getTrClone( $row ) );
+            this.cloneRow.width( $row.width() );
+            this.cloneRow.append( this.getTrClone( $row ) );
 
             $row.find( 'td' ).addClass( 'empty-temp' );
-            cloneRow.css({
+            this.cloneRow.css({
                 left: coords.left,
                 top: coords.top
             });
-        }
+        },
 
-        function startColsDrag( e ) {
-            getRectCoords();
-            conditionDragObj = this;
-            cacheDropTargetRectangles( $( this ).parent().children(), true );
-            clearCloneTable( cloneTable );
-            setDragColumn( this );
+        startColsDrag: function( eventContext, e ) {
+            this.getRectCoords();
+            this.conditionDragObj = eventContext;
+            this.cacheDropTargetRectangles( $( eventContext ).parent().children(), true );
+            this.clearCloneTable( this.cloneTable );
+            this.setDragColumn( eventContext );
 
-            activeDrag = 'cols';
-            mouseDownAt = {
+            this.activeDrag = 'cols';
+            this.mouseDownAt = {
                 x: e.pageX,
                 y: e.pageY,
-                dragObject: cloneTable[ 0 ]
+                dragObject: this.cloneTable[ 0 ]
             };
-            addDocumentEventHandlers();
+            this.addDocumentEventHandlers();
             document.body.style.cursor = 'move';
 
             return false;
-        }
+        },
 
-        function startRowsDrag( e ) {
-            if ( table.style["height"] === "" ) {
-                deleteHeightStyle = true;
+        startRowsDrag: function( eventContext, e ) {
+            if ( this.el.style["height"] === "" ) {
+                this.deleteHeightStyle = true;
             }
 
-            $table.height( $table.height() );
+            this.table.height( this.table.height() );
 
-            getRectCoords();
-            conditionDragObj = this;
-            cacheDropTargetRectangles( rows );
-            clearRowClone( cloneRow );
-            setDragRow( this );
+            this.getRectCoords();
+            this.conditionDragObj = eventContext;
+            this.cacheDropTargetRectangles( this.rows );
+            this.clearRowClone( this.cloneRow );
+            this.setDragRow( eventContext );
 
-            activeDrag = 'rows';
-            mouseDownAt = {
+            this.activeDrag = 'rows';
+            this.mouseDownAt = {
                 x: e.pageX,
                 y: e.pageY,
-                dragObject: cloneRow[ 0 ]
+                dragObject: this.cloneRow[ 0 ]
             };
-            addDocumentEventHandlers();
+            this.addDocumentEventHandlers();
             document.body.style.cursor = 'move';
 
             return false;
-        }
+        },
 
-        function mousemove( e ) {
-            if ( mouseDownAt ) {
-
-                if ( Math.abs( mouseDownAt.x - e.pageX ) < 10 && Math.abs( mouseDownAt.y - e.pageY ) < 10 ) {
+        mousemove: function( eventContext, e ) {
+            if ( this.mouseDownAt ) {
+                if ( Math.abs( this.mouseDownAt.x - e.pageX ) < 10 &&
+                     Math.abs( this.mouseDownAt.y - e.pageY ) < 10 )
+                {
                     return;
                 }
 
-                dragObject = mouseDownAt.dragObject;
+                this.dragObject = this.mouseDownAt.dragObject;
 
-                if ( activeDrag === 'rows' ) {
-                    cloneRow.appendTo( 'body' );
+                if ( this.activeDrag === 'rows' ) {
+                    this.cloneRow.appendTo( 'body' );
                 } else {
-                    cloneTable.appendTo( 'body' );
+                    this.cloneTable.appendTo( 'body' );
                 }
 
-                mouseOffset = getMouseOffset( dragObject, mouseDownAt.x, mouseDownAt.y );
-                mouseDownAt = null;
+                this.mouseOffset = this.getMouseOffset( this.dragObject, this.mouseDownAt.x, this.mouseDownAt.y );
+                this.mouseDownAt = null;
                 $( '.empty-temp' ).addClass( 'empty-object' );
             }
 
-            showDrag( e );
-        }
+            this.showDrag( e );
+        },
 
-        function mouseup() {
-            if ( !dragObject ) {
-                mouseDownAt = null;
+        mouseup: function() {
+            if ( !this.dragObject ) {
+                this.mouseDownAt = null;
             }
-            dragObject = null;
-            hideEmpty();
-            removeDocumentEventHandlers();
+            this.dragObject = null;
+            this.hideEmpty();
+            this.removeDocumentEventHandlers();
             document.body.style.cursor = '';
         }
+    };
 
-        api = {
-            stopRowsDrag: function() {
-                $( rows ).unbind( 'mousedown' );
-            },
-            stopColsDrag: function() {
-                $( cols ).unbind( 'mousedown' );
-            },
-            startRowsDrag: function() {
-                $( rows ).bind( 'mousedown', startRowsDrag );
-            },
-            startColsDrag: function() {
-                $( cols ).bind( 'mousedown', startColsDrag );
-            },
-
-            addRow: function() {
-                var tr = $( '<tr>' ), length = $( rows ).filter( 'tr:last' ).children().length, i = 0;
-
-                do {
-                    tr.append( $( '<td>' ) );
-                    i++;
-                }
-                while ( i < length )
-
-                tr.bind( 'mousedown', event, startRowsDrag ).appendTo( table );
-                rows = tbody.children;
-                getRectCoords();
-                cloneTable.append( $( '<tr>' ) );
-            },
-
-            addCol: function() {
-                $( rows ).each( function() {
-                    $( this ).append( $( '<td>' ) );
-                });
-
-                getRectCoords();
-            },
-
-            delRow: function( numRow ) {
-                var num = numRow === undefined ? rows.length - 1 : numRow - 1;
-
-                $( rows[ num ] ).remove();
-                rows = tbody.children;
-                getRectCoords();
-                cloneTable.children().children().eq( num ).remove();
-            },
-
-            delCol: function( numCol ) {
-                var num, length = $( rows[ 0 ] ).children().length;
-
-                if ( numCol === undefined ) {
-                    num = length - 1;
-                } else if ( numCol > length ) {
-                    return;
-                } else {
-                    num = numCol - 1;
-                }
-
-                $( rows ).each( function() {
-                    $( this ).children().eq( num ).remove();
-                });
-
-                cols = $( rows ).children().filter( 'th' );
-                getRectCoords();
-            },
-
-            startEditMode: function() {
-                var text, input = null, td, width, height;
-
-                $table.delegate( 'td, th', 'click', function( e ) {
-                    if ( $( this ).hasClass( 'edit-mode-on' ) ) {
-                        return false;
-                    }
-
-                    if ( input !== null ) {
-                        input.trigger( 'focusout' );
-                    }
-
-                    input  = $( '<textarea>' );
-                    td     = $( this ).addClass( 'edit-mode-on' );
-                    width  = td.width() - 4;
-                    height = td.height() - 4;
-                    text   = td.text();
-
-                    td.text( "" ).append( input );
-
-                    input
-                        .val( text )
-                        .focus()
-                        .css( { display: "block", width: width, height: height } )
-                        .focusout( function() {
-                            text = input.val();
-                            input.remove();
-                            input = null;
-                            td.text( text ).removeClass( 'edit-mode-on' );
-                        })
-                        .keydown( function( e ) {
-                            if ( e.keyCode === 13 || e.keyCode === 27 ) {
-                                $( this ).trigger( 'focusout' );
-                            }
-                        })
-                        .click( function( e ) {
-                            e.stopPropagation();
-                        });
-
-                    e.stopPropagation();
-                });
-            },
-
-            stopEditMode: function() {
-                $table.unbind( 'click' );
-            }
-        };
-
-        init();
-    }
-
-    $.fn.tableSorter = function( options ) {
+    $.fn.TableSorter = function( options ) {
         var item, entity;
         $( this ).each( function() {
             item = $( this );
-            if ( item.data( 'tableSorter' ) ) {
-                console.log( 'Sorter already init', this );
+            if ( item.data( 'TableSorter' ) ) {
+                console.log( 'TableSorter already init', this );
             } else {
-                entity = TableSorter( this, options );
-                item.data( 'tableSorter', entity );
+                entity = new TableSorter( this, options );
+                item.data( 'TableSorter', entity );
             }
         });
-    }
-})( jQuery );
+    };
+
+})( jQuery, window, undefined );

@@ -1,357 +1,76 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+﻿<!DOCTYPE html>
+<html>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
-    <title>drag'n'drop</title>
+    <title>drag'n'drop</title>    
     <link href="table-sorter.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="table-sorter.js"></script>
 </head>
 
 <body>
 
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script type="text/javascript" src="table-sorter.js"></script>
+<pre>
+<span>/**<br /> * -=== Table Sorter ===-</span>
+<span> * See <a href="http://github.com/maiordom/table-sorter">http://github.com/maiordom/table-sorter</a></span>
+<span> */</span>
+</pre>
+
+<div class="examples">
+
+    <table class="table" cellspacing="10">
+       <tr class="head">
+            <th>Drag&Drop&nbsp;me</th>
+            <td>Mandarins</td>
+            <th>Cacti</th>
+            <th>Tomatoes</th>
+            <th>Flowers</th>
+        </tr>
+        <tr class="odd">
+            <td>And me too</td>
+            <td>200 kg</td>
+            <td>300 kg</td>
+            <td>400 kg</td>
+            <td>500 kg</td>
+        </tr>
+        <tr class="even">
+            <td style="height:50px">20 кило</td>
+            <td>0.6 g</td>
+            <td>0.7 g</td>
+            <td>0.9 g</td>
+            <td>0.8 g</td>
+        </tr>
+        <tr class="odd">
+            <td>30 kg</td>
+            <td style="background:#332211; color:#fff;">2 т</td>
+            <td>3 tons</td>
+            <td>4 tons</td>
+            <td>5 tons</td>
+        </tr>
+        <tr class="even">
+            <td>40 kg</td>
+            <td>20 tons</td>
+            <td>30 tons</td>
+            <td>40 tons</td>
+            <td>50 tons</td>
+        </tr>
+        <tr class="odd">
+            <td style="height:100px; width:100px;">50 kg</td>
+            <td>### tons</td>
+            <td>### tons</td>
+            <td>### tons</td>
+            <td>### tons</td>
+        </tr>
+    </table>
+
+</div>
+
 <script type="text/javascript">
-    $( document ).ready( function() {
-        var methods = 'stopRowsDrag stopColsDrag startRowsDrag startColsDrag addRow addCol delRow delCol startEditMode stopEditMode'.split( ' ' );
-
-        for ( var i = 0; i < methods.length; i++ ) {
-            $( '.method-drag-1, .method-drag-2' ).append(
-                $( '<option>', { text: methods[ i ] } )
-            );
-        }
-
-        $( '#examples table' ).tableSorter();
-
-        var table1API = $( '#drag-table-1' ).data( 'tableSorter' ),
-            table2API = $( '#drag-table-2' ).data( 'tableSorter' );
-
-        $( '.init-method-drag-1' ).click( function() {
-            var methodName = $( '.method-drag-1 option:selected' ).text();
-            table1API[ methodName ]();
-        });
-
-        $( '.init-method-drag-2' ).click( function() {
-            var methodName = $( '.method-drag-2 option:selected' ).text();
-            table2API[ methodName ]();
-        });
-    });
+    (function( $ ) {
+        $( '.examples table' ).TableSorter();
+    })( jQuery );
 </script>
-
-<div id="tutorial">
-
-    <div id="header">table sorter - cross browser jQuery plugin</div>
-
-    <p>After include the relevant files in the &lt;HEAD&gt; of your document, initialise plugin on document.ready:</p>
-
-    <pre>
-    $( document ).ready( function() {
-        $( '#examples table' ).tableSorter();
-    });
-    </pre>
-
-    <p>For example, we can stop row dragging for a third table by using:</p>
-
-    <pre>
-    $( '#drag-table-3' ).tableSorter( 'stopRowsDrag' );
-    </pre>
-
-    <p>If the table has no &lt;TH&gt; tag, the event to move columns is not possible.</p>
-
-    <p>The Plugin uses CSS:</p>
-
-    <pre>
-    .empty-object {
-        background:#034 !important;
-        color:#034 !important;
-        }
-    </pre>
-
-    <p>To finish editing cell press esc or enter when edit mode on.</p>
-
-    <div id="header-2">table sorter - API documentation</div>
-
-    <table cellspacing="5">
-        <tbody>
-        <tr>
-            <td>stopRowsDrag()</td>
-        <tr>
-            <td>stopColsDrag()</td>
-        </tr>
-        <tr>
-            <td>startRowsDrag()</td>
-        </tr>
-        <tr>
-            <td>startColsDrag()</td>
-        </tr>
-        <tr>
-            <td>addRow()</td>
-        </tr>
-        <tr>
-            <td>addCol()</td>
-        </tr>
-        <tr>
-            <td>delRow( numRow )</td>
-        </tr>
-        <tr>
-            <td>delCol( numCol )</td>
-        </tr>
-        <tr>
-            <td>startEditMode()</td>
-        </tr>
-        <tr>
-            <td>stopEditMode()</td>
-        </tr>
-        </tbody>
-    </table>
-
-</div>
-
-<div id="examples">
-
-    <table cellspacing="0" id="drag-table-1">
-        <tbody>
-        <tr>
-            <th>Апельсины</th>
-            <td>Мандарины</td>
-            <th>Кактусы</th>
-            <th>Помидоры</th>
-            <th>Цветочки</th>
-        </tr>
-        <tr>
-            <td>100 кг</td>
-            <td>200 кг</td>
-            <td>300 кг</td>
-            <td>400 кг</td>
-            <td>500 кг</td>
-        </tr>
-        <tr>
-            <td>0.5 г</td>
-            <td>0.6 г</td>
-            <td>0.7 г</td>
-            <td>0.9 г</td>
-            <td>0.8 г</td>
-        </tr>
-        <tr>
-            <td>1 т</td>
-            <td>2 т</td>
-            <th>3 т</th>
-            <td>4 т</td>
-            <td> 5 т</td>
-        </tr>
-        <tr>
-            <td>10 т</td>
-            <td>20 т</td>
-            <td>30 т</td>
-            <td>40 т</td>
-            <td>50 т</td>
-        </tr>
-        <tr>
-            <td>### т</td>
-            <td>### т</td>
-            <td>### т</td>
-            <td>### т</td>
-            <td>### т</td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div class="control-buttons">
-        <span>tableSorter method</span>
-        <select class="method-drag-1" type="text"></select>
-        <input class="init-method-drag-1" type="button" value="init method"/>
-    </div>
-
-    <table cellspacing="3" id="drag-table-2" border="1">
-        <tbody>
-        <tr>
-            <th>Апельсины</th>
-            <th>Мандарины</th>
-            <th>Кактусы</th>
-            <th>Помидоры</th>
-            <th>Цветочки</th>
-        </tr>
-        <tr>
-            <th style="background:#4ceb9f;">100 кг</th>
-            <td>200 кг</td>
-            <td>
-                <table border="1" style="width:100%;">
-                    <tr>
-                        <th>Он</th>
-                        <th>Она</th>
-                    </tr>
-                    <tr>
-                        <td>100$</td>
-                        <td>200$</td>
-                    </tr>
-                    <tr>
-                        <td>300$</td>
-                        <td>
-                            <table border="1" style="width:100%;">
-                                <tr>
-                                    <th>A-Z</th>
-                                    <th>A-F</th>
-                                    <th>B-D</th>
-                                </tr>
-                                <tr>
-                                    <td>a</td>
-                                    <td>c</td>
-                                    <td>f</td>
-                                </tr>
-                                <tr>
-                                    <td>b</td>
-                                    <td>h</td>
-                                    <td>g</td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td>400 кг</td>
-            <th style="background:#eb544c;">500 кг</th>
-        </tr>
-        <tr>
-            <td style="height:50px !important;">0.5 г</td>
-            <th style="background:#e69553;">0.6 г</th>
-            <td>0.7 г</td>
-            <td>0.9 г</td>
-            <td>0.8 г</td>
-        </tr>
-        <tr>
-            <td>1 т</td>
-            <td>2 т</td>
-            <th style="background:#e69553; width:200px !important;">3 т</th>
-            <td>4 т</td>
-            <td> 5 т</td>
-        </tr>
-        <tr>
-            <td>10 т</td>
-            <td>20 т</td>
-            <td>30 т</td>
-            <td>40 т</td>
-            <td>50 т</td>
-        </tr>
-        <tr>
-            <td>### т</td>
-            <td>### т</td>
-            <td>### т</td>
-            <td>### т</td>
-            <td>
-                <table border="1" style="width:100%;">
-                    <tr>
-                        <th>Я</th>
-                        <th>Ты</th>
-                    </tr>
-                    <tr>
-                        <td>100р.</td>
-                        <td>200р.</td>
-                    </tr>
-                    <tr>
-                        <td>300р.</td>
-                        <td>400р.</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div class="control-buttons">
-        <span>tableSorter method</span>
-        <select class="method-drag-2" type="text"></select>
-        <input class="init-method-drag-2" type="button" value="init method"/>
-    </div>
-
-    <table cellspacing="2" id="drag-table-3" border="2">
-        <tbody>
-        <tr>
-            <th>Фрукты</th>
-            <th>Мебель</th>
-            <th style="width:150px !important;">Гардероб</th>
-            <th>Белье</th>
-            <th>Цветочки</th>
-        </tr>
-        <tr>
-            <td>10 кило</td>
-            <td>200 кг</td>
-            <td>300 кг</td>
-            <td>400 кг</td>
-            <td>500 кг</td>
-        </tr>
-        <tr>
-            <td style="height:50px">20 кило</td>
-            <td>0.6 г</td>
-            <td>0.7 г</td>
-            <td>0.9 г</td>
-            <td>0.8 г</td>
-        </tr>
-        <tr>
-            <td>30 кило</td>
-            <td style="background:#332211; color:#fff;">2 т</td>
-            <td>3 т</td>
-            <td>4 т</td>
-            <td> 5 т</td>
-        </tr>
-        <tr>
-            <td>40 кило</td>
-            <td>20 т</td>
-            <td>30 т</td>
-            <td>40 т</td>
-            <td>50 т</td>
-        </tr>
-        <tr>
-            <td style="height:100px; width:100px;">50 кило</td>
-            <td>### т</td>
-            <td>### т</td>
-            <td>### т</td>
-            <td>### т</td>
-        </tr>
-        </tbody>
-    </table>
-
-    <table cellspacing="10" id="drag-table-4" border="2">
-        <tbody>
-        <tr class="odd">
-            <td>10 кило</td>
-            <td>200 кг</td>
-            <td>300 кг</td>
-            <td>400 кг</td>
-            <td>500 кг</td>
-        </tr>
-        <tr class="even">
-            <td style="height:50px">20 кило</td>
-            <td>0.6 г</td>
-            <td>0.7 г</td>
-            <td>0.9 г</td>
-            <td>0.8 г</td>
-        </tr>
-        <tr class="odd">
-            <td>30 кило</td>
-            <td style="background:#332211; color:#fff;">2 т</td>
-            <td>3 т</td>
-            <td>4 т</td>
-            <td>5 т</td>
-        </tr>
-        <tr class="even">
-            <td>40 кило</td>
-            <td>20 т</td>
-            <td>30 т</td>
-            <td>40 т</td>
-            <td>50 т</td>
-        </tr>
-        <tr class="odd">
-            <td style="height:100px; width:100px;">50 кило</td>
-            <td>### т</td>
-            <td>### т</td>
-            <td>### т</td>
-            <td>### т</td>
-        </tr>
-        </tbody>
-    </table>
-
-</div>
 
 </body>
 
